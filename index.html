@@ -488,7 +488,7 @@
     </div>
 
     <!-- Device Verification Screen (App Lock / Key Gate) -->
-    <div id="authScreen">
+    <div id="authScreen" style="display: none;">
         <div class="card">
             <h2>Device Verification</h2>
             <p style="color:var(--text-secondary); font-size: 13px; margin-bottom: 20px;">Get Key par click karke access token generate karein ya direct enter karein.</p>
@@ -561,7 +561,7 @@
             </div>
 
             <!-- App 2: Gyanbindu -->
-            <div class="app-card" data-name="gyanbindu">
+            <div class="app-btn-card app-card" data-name="gyanbindu">
                 <div class="app-info">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCFvhxybNgyZB2ctiSjQkoDvGk9KjyK-tG34NGXWwaRA&s=10" class="app-icon" alt="Gyanbindu">
                     <div class="app-details">
@@ -579,15 +579,14 @@
     </div>
 
     <script>
-        // Check 24 hours session validity immediately when script runs
+        // Check 24 hours session immediately on load
         (function() {
             const expiryTime = localStorage.getItem("app_expiry_time");
+            const authScreen = document.getElementById('authScreen');
             if (expiryTime && new Date().getTime() < parseInt(expiryTime)) {
-                // Session is active, keep auth screen hidden
-                document.addEventListener("DOMContentLoaded", () => {
-                    const authScreen = document.getElementById('authScreen');
-                    if(authScreen) authScreen.style.display = 'none';
-                });
+                if(authScreen) authScreen.style.display = 'none';
+            } else {
+                if(authScreen) authScreen.style.display = 'flex';
             }
         })();
 
@@ -630,7 +629,7 @@
                 });
         }
 
-        // Verify Key & Single-use restriction logic (Allows any valid 21-character code)
+        // Verify Key & Single-use restriction logic
         function verifyUserKey() {
             const userKey = document.getElementById("accessKeyInput").value.trim().toUpperCase();
             const usedKeys = JSON.parse(localStorage.getItem("used_app_keys") || "[]");
@@ -642,27 +641,22 @@
                 return;
             }
 
-            // Check if key was already used before
             if (usedKeys.includes(userKey)) {
                 msgDiv.style.color = "#ff4d4d";
                 msgDiv.innerText = "This token has already been used!";
                 return;
             }
 
-            // Accept any code if it is 21 characters long
             if (userKey.length === 21) {
-                // Mark key as used so it cannot be reused
                 usedKeys.push(userKey);
                 localStorage.setItem("used_app_keys", JSON.stringify(usedKeys));
 
-                // Grant 24 hours session access (24 * 60 * 60 * 1000 ms)
                 const twentyFourHours = 24 * 60 * 60 * 1000;
                 const expiryTimestamp = new Date().getTime() + twentyFourHours;
                 localStorage.setItem("app_expiry_time", expiryTimestamp);
 
                 document.getElementById('authScreen').style.display = 'none';
 
-                // Clean URL parameters so key isn't stuck in address bar
                 if (window.history.replaceState) {
                     const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                     window.history.replaceState({path: cleanUrl}, '', cleanUrl);
@@ -683,19 +677,23 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             const splash = document.getElementById("splash-screen");
-            setTimeout(() => splash.classList.add("hide-splash"), 1200);
-
-            // Double check expiry on load
-            const expiryTime = localStorage.getItem("app_expiry_time");
-            if (expiryTime && new Date().getTime() < parseInt(expiryTime)) {
-                document.getElementById('authScreen').style.display = 'none';
+            
+            // Splash screen sirf ek baar dikhegi (Session storage check)
+            if (!sessionStorage.getItem('splashShown')) {
+                setTimeout(() => {
+                    splash.classList.add("hide-splash");
+                    sessionStorage.setItem('splashShown', 'true');
+                }, 1200);
             } else {
-                // Auto-fill key if passed via URL parameter
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlKey = urlParams.get('key');
-                if (urlKey) {
-                    document.getElementById('accessKeyInput').value = urlKey;
-                }
+                // Agar pehle se dikh chuki hai to turant hide kar do bina delay ke
+                splash.style.display = 'none';
+            }
+
+            // URL parameter key auto-fill handler
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlKey = urlParams.get('key');
+            if (urlKey) {
+                document.getElementById('accessKeyInput').value = urlKey;
             }
 
             if (!sessionStorage.getItem('popupShown')) {
