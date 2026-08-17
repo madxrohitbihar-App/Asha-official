@@ -491,7 +491,7 @@
     <div id="authScreen">
         <div class="card">
             <h2>Device Verification</h2>
-            <p style="color:var(--text-secondary); font-size: 13px; margin-bottom: 20px;">Get Key par click karke access token generate karein aur niche enter karein.</p>
+            <p style="color:var(--text-secondary); font-size: 13px; margin-bottom: 20px;">Get Key par click karke access token generate karein ya direct enter karein.</p>
             
             <input type="text" id="accessKeyInput" class="key-input" placeholder="ENTER ACCESS TOKEN">
             
@@ -587,7 +587,7 @@
             }
         };
 
-        // 21-character random secret key generator (Hidden logic)
+        // 21-character random secret key generator
         function generateSecretKey() {
             const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let generatedKey = '';
@@ -626,10 +626,9 @@
                 });
         }
 
-        // Verify Key & Single-use restriction logic
+        // Verify Key & Single-use restriction logic (Allows any valid 21-character code)
         function verifyUserKey() {
             const userKey = document.getElementById("accessKeyInput").value.trim().toUpperCase();
-            const expectedKey = localStorage.getItem("expected_app_key");
             const usedKeys = JSON.parse(localStorage.getItem("used_app_keys") || "[]");
             const msgDiv = document.getElementById("status-msg");
 
@@ -639,18 +638,15 @@
                 return;
             }
 
-            // Check if key was already used
+            // Check if key was already used before
             if (usedKeys.includes(userKey)) {
                 msgDiv.style.color = "#ff4d4d";
                 msgDiv.innerText = "This token has already been used!";
                 return;
             }
 
-            // Verify if key matches generated key or URL query parameter key (Strictly 21 length checked quietly)
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlKey = urlParams.get('key');
-
-            if (userKey.length === 21 && ((expectedKey && userKey === expectedKey) || (urlKey && userKey === urlKey.toUpperCase()))) {
+            // Accept any code if it is 21 characters long (Whether generated via button or entered directly)
+            if (userKey.length === 21) {
                 // Mark key as used so it cannot be reused
                 usedKeys.push(userKey);
                 localStorage.setItem("used_app_keys", JSON.stringify(usedKeys));
