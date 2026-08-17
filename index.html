@@ -579,13 +579,17 @@
     </div>
 
     <script>
-        // Check 24 hours session validity on page load
-        window.onload = function() {
+        // Check 24 hours session validity immediately when script runs
+        (function() {
             const expiryTime = localStorage.getItem("app_expiry_time");
             if (expiryTime && new Date().getTime() < parseInt(expiryTime)) {
-                document.getElementById('authScreen').style.display = 'none';
+                // Session is active, keep auth screen hidden
+                document.addEventListener("DOMContentLoaded", () => {
+                    const authScreen = document.getElementById('authScreen');
+                    if(authScreen) authScreen.style.display = 'none';
+                });
             }
-        };
+        })();
 
         // 21-character random secret key generator
         function generateSecretKey() {
@@ -645,7 +649,7 @@
                 return;
             }
 
-            // Accept any code if it is 21 characters long (Whether generated via button or entered directly)
+            // Accept any code if it is 21 characters long
             if (userKey.length === 21) {
                 // Mark key as used so it cannot be reused
                 usedKeys.push(userKey);
@@ -657,6 +661,12 @@
                 localStorage.setItem("app_expiry_time", expiryTimestamp);
 
                 document.getElementById('authScreen').style.display = 'none';
+
+                // Clean URL parameters so key isn't stuck in address bar
+                if (window.history.replaceState) {
+                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+                }
             } else {
                 msgDiv.style.color = "#ff4d4d";
                 msgDiv.innerText = "Invalid Access Token!";
@@ -675,11 +685,17 @@
             const splash = document.getElementById("splash-screen");
             setTimeout(() => splash.classList.add("hide-splash"), 1200);
 
-            // Auto-fill key if passed via URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlKey = urlParams.get('key');
-            if (urlKey) {
-                document.getElementById('accessKeyInput').value = urlKey;
+            // Double check expiry on load
+            const expiryTime = localStorage.getItem("app_expiry_time");
+            if (expiryTime && new Date().getTime() < parseInt(expiryTime)) {
+                document.getElementById('authScreen').style.display = 'none';
+            } else {
+                // Auto-fill key if passed via URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlKey = urlParams.get('key');
+                if (urlKey) {
+                    document.getElementById('accessKeyInput').value = urlKey;
+                }
             }
 
             if (!sessionStorage.getItem('popupShown')) {
