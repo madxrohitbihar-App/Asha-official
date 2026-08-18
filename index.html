@@ -487,7 +487,7 @@
         <div class="splash-title">MADXROHITBIHAR</div>
     </div>
 
-    <!-- Device Verification Screen (App Lock / Key Gate) -->
+    <!-- Device Verification Screen -->
     <div id="authScreen" style="display: none;">
         <div class="card">
             <h2>Device Verification</h2>
@@ -543,13 +543,10 @@
             <span id="active-count" style="color: var(--neon-cyan);">1 Available</span>
         </div>
 
-        <!-- Only Aash official App Listed Here -->
         <div class="app-list" id="active-apps-list">
-            
-            <!-- App: Aash official -->
-            <div class="app-card" data-name="gyanbindu">
+            <div class="app-card" data-name="aash official">
                 <div class="app-info">
-                    <img src="https://i.postimg.cc/TPSshWGp/image-search-1787041006864.jpg" class="app-icon" alt="Gyanbindu">
+                    <img src="https://i.postimg.cc/TPSshWGp/image-search-1787041006864.jpg" class="app-icon" alt="Aash Official">
                     <div class="app-details">
                         <span class="app-name">Aash official</span>
                         <span class="app-tag">Server Active</span>
@@ -559,7 +556,6 @@
                     <a href="https://studyapkmod-live.vercel.app/home.html?domainId=8630" class="open-btn" target="_blank">Open</a>
                 </div>
             </div>
-
         </div>
 
     </div>
@@ -592,7 +588,8 @@
             const freshKey = generateSecretKey();
             localStorage.setItem("expected_app_key", freshKey);
 
-            const targetUrl = "https://madxrohitbihar-app.github.io/asha-official-1/" + freshKey;
+            // Fixed URL format with query parameter ?key=
+            const targetUrl = "https://madxrohitbihar-app.github.io/asha-official-1/?key=" + freshKey;
             const apiUrl = `https://arolinks.com/api?api=${apiToken}&url=${encodeURIComponent(targetUrl)}`;
 
             const msgDiv = document.getElementById("status-msg");
@@ -615,9 +612,10 @@
                 });
         }
 
-        // Verify Key & Single-use restriction logic
+        // Verify Key Logic
         function verifyUserKey() {
             const userKey = document.getElementById("accessKeyInput").value.trim().toUpperCase();
+            const expectedKey = localStorage.getItem("expected_app_key");
             const usedKeys = JSON.parse(localStorage.getItem("used_app_keys") || "[]");
             const msgDiv = document.getElementById("status-msg");
 
@@ -633,7 +631,8 @@
                 return;
             }
 
-            if (userKey.length === 21) {
+            // Match with generated key or allow if direct 21-char valid format fallback
+            if ((expectedKey && userKey === expectedKey) || userKey.length === 21) {
                 usedKeys.push(userKey);
                 localStorage.setItem("used_app_keys", JSON.stringify(usedKeys));
 
@@ -677,6 +676,8 @@
             const urlKey = urlParams.get('key');
             if (urlKey) {
                 document.getElementById('accessKeyInput').value = urlKey;
+                // Automatically save it as expected key if user came back from key page with a key
+                localStorage.setItem("expected_app_key", urlKey);
             }
 
             if (!sessionStorage.getItem('popupShown')) {
