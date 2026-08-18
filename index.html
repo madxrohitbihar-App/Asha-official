@@ -540,32 +540,18 @@
                 <span class="live-dot"></span>
                 <span>All Active App</span>
             </div>
-            <span id="active-count" style="color: var(--neon-cyan);">2 Available</span>
+            <span id="active-count" style="color: var(--neon-cyan);">1 Available</span>
         </div>
 
-        <!-- Only 2 Apps Listed Here -->
+        <!-- Only Gyanbindu App Listed Here -->
         <div class="app-list" id="active-apps-list">
             
-            <!-- App 1: App Key -->
-            <div class="app-card" data-name="app key">
-                <div class="app-info">
-                    <img src="https://i.postimg.cc/8kv2Mtxv/IMG-20260731-232847-281.jpg" class="app-icon" alt="App Key">
-                    <div class="app-details">
-                        <span class="app-name">1. APP KEY</span>
-                        <span class="app-tag">Server Active</span>
-                    </div>
-                </div>
-                <div class="app-actions">
-                    <a href="https://studyapkmod-live.vercel.app/vverify.html?dev=dev_aj1bc7bfe&t=1787017138112" class="open-btn" target="_blank">Open</a>
-                </div>
-            </div>
-
-            <!-- App 2: Gyanbindu -->
-            <div class="app-btn-card app-card" data-name="gyanbindu">
+            <!-- App: Gyanbindu -->
+            <div class="app-card" data-name="gyanbindu">
                 <div class="app-info">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCFvhxybNgyZB2ctiSjQkoDvGk9KjyK-tG34NGXWwaRA&s=10" class="app-icon" alt="Gyanbindu">
                     <div class="app-details">
-                        <span class="app-name">2. GYANBINDU</span>
+                        <span class="app-name">GYANBINDU</span>
                         <span class="app-tag">Server Active</span>
                     </div>
                 </div>
@@ -678,18 +664,15 @@
         document.addEventListener("DOMContentLoaded", () => {
             const splash = document.getElementById("splash-screen");
             
-            // Splash screen sirf ek baar dikhegi (Session storage check)
             if (!sessionStorage.getItem('splashShown')) {
                 setTimeout(() => {
                     splash.classList.add("hide-splash");
                     sessionStorage.setItem('splashShown', 'true');
                 }, 1200);
             } else {
-                // Agar pehle se dikh chuki hai to turant hide kar do bina delay ke
                 splash.style.display = 'none';
             }
 
-            // URL parameter key auto-fill handler
             const urlParams = new URLSearchParams(window.location.search);
             const urlKey = urlParams.get('key');
             if (urlKey) {
