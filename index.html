@@ -572,11 +572,11 @@
             }
         })();
 
-        // 21-character random secret key generator
+        // 28-character random secret key generator
         function generateSecretKey() {
             const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let generatedKey = '';
-            for (let i = 0; i < 21; i++) {
+            for (let i = 0; i < 28; i++) {
                 generatedKey += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             return generatedKey;
@@ -631,8 +631,8 @@
                 return;
             }
 
-            // Match with generated key or allow if direct 21-char valid format fallback
-            if ((expectedKey && userKey === expectedKey) || userKey.length === 21) {
+            // Match with generated key or allow if direct 28-char valid format fallback
+            if ((expectedKey && userKey === expectedKey) || userKey.length === 28) {
                 usedKeys.push(userKey);
                 localStorage.setItem("used_app_keys", JSON.stringify(usedKeys));
 
